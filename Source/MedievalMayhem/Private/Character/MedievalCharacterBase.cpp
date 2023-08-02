@@ -48,7 +48,8 @@ UAbilitySystemComponent* AMedievalCharacterBase::GetAbilitySystemComponent() con
 
 bool AMedievalCharacterBase::IsAlive() const
 {
-	return GetHealth() > 0.0f;
+	float Health = GetHealth();
+	return Health > 0.0f;
 }
 
 int32 AMedievalCharacterBase::GetAbilityLevel(MedievalAbilityID AbilityID) const
@@ -58,10 +59,11 @@ int32 AMedievalCharacterBase::GetAbilityLevel(MedievalAbilityID AbilityID) const
 
 void AMedievalCharacterBase::AddCharacterAbilities()
 {
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || !AbilitySystemComponent->bCharacterAbilitiesGiven) return;
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || AbilitySystemComponent->bCharacterAbilitiesGiven) return;
 	for (TSubclassOf<UCharacterGameplayAbility>& StartupAbility : CharacterAbilities)
 	{
 		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility, GetAbilityLevel(StartupAbility.GetDefaultObject()->AbilityID), static_cast<int32>(StartupAbility.GetDefaultObject()->AbilityInputID), this));
+		UE_LOG(LogTemp, Warning, TEXT("Ability Name : %s"), *StartupAbility.GetDefaultObject()->GetName())
 	}
 }
 
@@ -107,7 +109,18 @@ void AMedievalCharacterBase::InitializeAtrributes()
 
 void AMedievalCharacterBase::AddStartupEffects()
 {
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || !AbilitySystemComponent->bStartupEffectsApplied) return;
+	bool bHasAuth = GetLocalRole() != ROLE_Authority;
+	bool bAbilityCompValid = !AbilitySystemComponent.IsValid();
+	bool bEffectsApp = !AbilitySystemComponent->bStartupEffectsApplied;
+	bool HasValidAuth = bHasAuth || bAbilityCompValid || bEffectsApp;
+
+	UE_LOG(LogTemp, Warning, TEXT("bHasAuth value is %s"), (bHasAuth ? TEXT("true") : TEXT("false")));
+	UE_LOG(LogTemp, Warning, TEXT("bAbilityCompValid value is %s"), (bAbilityCompValid ? TEXT("true") : TEXT("false")));
+	UE_LOG(LogTemp, Warning, TEXT("bEffectsApp value is %s"), (bEffectsApp ? TEXT("true") : TEXT("false")));
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || AbilitySystemComponent->bStartupEffectsApplied)
+	{
+		return;
+	}
 
 	FGameplayEffectContextHandle EffectContextHandle = AbilitySystemComponent->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(this);

@@ -32,6 +32,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Medieval|Camera")
 	FVector GetStartingCameraBoomLocation();
 
+	virtual void Tick(float DeltaTime) override;
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Medieval|Camera")
 	float BaseTurnRate = 45.0f;
@@ -55,37 +56,40 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Medieval|Input")
-	class UInputMappingContext* MedievalMappingContext;
+	//Movement Input
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Movement")
+	class UInputMappingContext* MedievalMovementMappingContext;
 
-	UPROPERTY(EditAnywhere, Category = "Medieval|Input")
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Movement")
 	class UInputAction* MovementAction;
 
-	UPROPERTY(EditAnywhere, Category = "Medieval|Input")
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Movement")
 	class UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, Category = "Medieval|Input")
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Movement")
 	class UInputAction* JumpAction;
+
+	//Ability Input
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Ability")
+	class UInputMappingContext* MedievalAbilityMappingContext;
+
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Ability")
+	class UInputAction* BasicAbility_Action;
+
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Ability")
+	class UInputAction* Ability_1_Action;
+
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Ability")
+	class UInputAction* Ability_2_Action;
+
+	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Ability")
+	class UInputAction* Ability_3_Action;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
-	void LookUp(float Value);
-
-	void LookUpRate(float Value);
-
-	void Turn(float Value);
-
-	void TurnRate(float Value);
-
-	void MoveForward(float Value);
-
-	void MoveRight(float Value);
-
 	virtual void OnRep_PlayerState() override;
 
 	void InitializeAbilityValues(class AMedievalPlayerState* PS);
-
-	void BindASCInput();
 
 };

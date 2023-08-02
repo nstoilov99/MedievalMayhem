@@ -59,10 +59,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Medieval|Character|Attributes")
 	float GetMaxMana() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//UPROPERTY(BlueprintReadOnly, Category = "Medieval|Abilities")
 	TWeakObjectPtr<class UCharacterAbilitySystemComponent> AbilitySystemComponent;
 	TWeakObjectPtr<class UCharacterAttributeSetBase> AttributeSetBase;
 
@@ -92,4 +94,5 @@ protected:
 
 	virtual void SetHealth(float Health);
 	virtual void SetMana(float Mana);
+
 };

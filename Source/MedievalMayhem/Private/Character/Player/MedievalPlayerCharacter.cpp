@@ -13,6 +13,8 @@
 #include "MedievalMayhem/MedievalMayhem.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Character/Player/MedievalPlayerController.h"
+#include "Engine/EngineTypes.h"
+#include "Character/Abilities/CharacterAbilitySystemComponent.h"
 
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
@@ -40,12 +42,14 @@ AMedievalPlayerCharacter::AMedievalPlayerCharacter(const FObjectInitializer& Obj
 void AMedievalPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	AbilitySystemComponent = GetCharacterAbilitySystemComponent();
 
 	if (AMedievalPlayerController* PlayerController = Cast<AMedievalPlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(MedievalMappingContext, 0);
+			Subsystem->AddMappingContext(MedievalMovementMappingContext, 0);
+			Subsystem->AddMappingContext(MedievalAbilityMappingContext, 0);
 		}
 	}
 
@@ -59,6 +63,7 @@ void AMedievalPlayerCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		//Movement
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AMedievalPlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMedievalPlayerCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMedievalPlayerCharacter::Jump);
@@ -70,8 +75,6 @@ void AMedievalPlayerCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	//PlayerInputComponent->BindAxis("LookUpRate", this, &AMedievalPlayerCharacter::LookUpRate);
 	//PlayerInputComponent->BindAxis("Turn", this, &AMedievalPlayerCharacter::Turn);
 	//PlayerInputComponent->BindAxis("TurnRate", this, &AMedievalPlayerCharacter::TurnRate);
-
-	BindASCInput();
 }
 
 void AMedievalPlayerCharacter::PossessedBy(AController* NewController)
@@ -107,6 +110,27 @@ FVector AMedievalPlayerCharacter::GetStartingCameraBoomLocation()
 	return StartingCameraBoomLocation;
 }
 
+void AMedievalPlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	float Health = GetHealth();
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Health: %f"), Health));
+	//}
+}
+
+UCharacterAbilitySystemComponent* AMedievalPlayerCharacter::GetCharacterAbilitySystemComponent() const
+{
+	AMedievalPlayerState* PS = GetPlayerState<AMedievalPlayerState>();
+	if (PS)
+	{
+		return Cast<UCharacterAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+	}
+	return nullptr;
+}
+
+
 void AMedievalPlayerCharacter::Move(const FInputActionValue& Value)
 {
 	if (!IsAlive()) return;
@@ -121,52 +145,12 @@ void AMedievalPlayerCharacter::Move(const FInputActionValue& Value)
 
 void AMedievalPlayerCharacter::Look(const FInputActionValue& Value)
 {
-	if (!IsAlive()) return;
-	const FVector2D LookAxisVector = Value.Get<FVector2D>();
-	AddControllerPitchInput(LookAxisVector.Y);
-	AddControllerYawInput(LookAxisVector.X);
-}
-
-void AMedievalPlayerCharacter::LookUp(float Value)
-{
-	if (IsAlive())
+	if (IsAlive()) 
 	{
-		AddControllerPitchInput(Value);
+		const FVector2D LookAxisVector = Value.Get<FVector2D>();
+		AddControllerPitchInput(LookAxisVector.Y);
+		AddControllerYawInput(LookAxisVector.X);
 	}
-}
-
-void AMedievalPlayerCharacter::LookUpRate(float Value)
-{
-	if (IsAlive())
-	{
-		AddControllerPitchInput(Value * BaseLookUpRate * GetWorld()->DeltaTimeSeconds);
-	}
-}
-
-void AMedievalPlayerCharacter::Turn(float Value)
-{
-	if (IsAlive())
-	{
-		AddControllerYawInput(Value);
-	}
-}
-
-void AMedievalPlayerCharacter::TurnRate(float Value)
-{
-	if (IsAlive())
-	{
-		AddControllerYawInput(Value * BaseTurnRate * GetWorld()->DeltaTimeSeconds);
-	}
-}
-
-void AMedievalPlayerCharacter::MoveForward(float Value)
-{
-	AddMovementInput(UKismetMathLibrary::GetForwardVector(FRotator(0, GetControlRotation().Yaw, 0)), Value);
-}
-
-void AMedievalPlayerCharacter::MoveRight(float Value)
-{
-	AddMovementInput(UKismetMathLibrary::GetRightVector(FRotator(0, GetControlRotation().Yaw, 0)), Value);
 }
 
 void AMedievalPlayerCharacter::OnRep_PlayerState()
@@ -175,13 +159,11 @@ void AMedievalPlayerCharacter::OnRep_PlayerState()
 	if (PS)
 	{
 		InitializeAbilityValues(PS);
-		BindASCInput();
 	}
 }
 
 void AMedievalPlayerCharacter::InitializeAbilityValues(AMedievalPlayerState* PS)
 {
-
 	AbilitySystemComponent = Cast<UCharacterAbilitySystemComponent>(PS->GetAbilitySystemComponent());
 	PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, this);
 	AttributeSetBase = PS->GetAttrubuteSetBase();
@@ -190,13 +172,4 @@ void AMedievalPlayerCharacter::InitializeAbilityValues(AMedievalPlayerState* PS)
 	InitializeAtrributes();
 	SetHealth(GetMaxHealth());
 	SetMana(GetMaxMana());
-}
-
-void AMedievalPlayerCharacter::BindASCInput()
-{
-	if (bASCInputBound && AbilitySystemComponent.IsValid() && IsValid(InputComponent))
-	{
-		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, FGameplayAbilityInputBinds(FString("ConfirmTarget"), FString("CancelTarget"), FString("MedievalAbilityID"), static_cast<int32>(MedievalAbilityID::Confirm), static_cast<int32>(MedievalAbilityID::Cancel)));
-		bASCInputBound = true;
-	}
 }
