@@ -42,7 +42,6 @@ AMedievalPlayerCharacter::AMedievalPlayerCharacter(const FObjectInitializer& Obj
 void AMedievalPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	AbilitySystemComponent = GetCharacterAbilitySystemComponent();
 
 	if (AMedievalPlayerController* PlayerController = Cast<AMedievalPlayerController>(Controller))
 	{
@@ -120,15 +119,15 @@ void AMedievalPlayerCharacter::Tick(float DeltaTime)
 	//}
 }
 
-UCharacterAbilitySystemComponent* AMedievalPlayerCharacter::GetCharacterAbilitySystemComponent() const
-{
-	AMedievalPlayerState* PS = GetPlayerState<AMedievalPlayerState>();
-	if (PS)
-	{
-		return Cast<UCharacterAbilitySystemComponent>(PS->GetAbilitySystemComponent());
-	}
-	return nullptr;
-}
+//UCharacterAbilitySystemComponent* AMedievalPlayerCharacter::GetCharacterAbilitySystemComponent() const
+//{
+//	AMedievalPlayerState* PS = GetPlayerState<AMedievalPlayerState>();
+//	if (PS)
+//	{
+//		return Cast<UCharacterAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+//	}
+//	return nullptr;
+//}
 
 
 void AMedievalPlayerCharacter::Move(const FInputActionValue& Value)
