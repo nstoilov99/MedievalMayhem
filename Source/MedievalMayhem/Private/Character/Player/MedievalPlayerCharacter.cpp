@@ -50,10 +50,16 @@ void AMedievalPlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(MedievalMovementMappingContext, 0);
 			Subsystem->AddMappingContext(MedievalAbilityMappingContext, 0);
 		}
+		AbilitySystemComponent->ReceivedDamage.AddDynamic(this, &AMedievalPlayerCharacter::ReceiveDamage);
 	}
 
 	StartingCameraBoomArmLength = CameraBoom->TargetArmLength;
 	StartingCameraBoomLocation = CameraBoom->GetRelativeLocation();
+}
+
+void AMedievalPlayerCharacter::ReceiveDamage(UCharacterAbilitySystemComponent* SourceASC, float UnmitigatedDamage, float MitigatedDamage)
+{
+	
 }
 
 void AMedievalPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -117,6 +123,11 @@ void AMedievalPlayerCharacter::Tick(float DeltaTime)
 	//{
 	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Health: %f"), Health));
 	//}
+	
+	if (AMedievalPlayerController* MedievalController = Cast<AMedievalPlayerController>(Controller))
+	{
+		MedievalController->SetHUDHealth(GetHealth(), GetMaxHealth());
+	}
 }
 
 //UCharacterAbilitySystemComponent* AMedievalPlayerCharacter::GetCharacterAbilitySystemComponent() const

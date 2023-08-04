@@ -56,6 +56,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void ReceiveDamage(class UCharacterAbilitySystemComponent* SourceASC, float UnmitigatedDamage, float MitigatedDamage);
 	//Movement Input
 	UPROPERTY(EditAnywhere, Category = "Medieval|Input|Movement")
 	class UInputMappingContext* MedievalMovementMappingContext;

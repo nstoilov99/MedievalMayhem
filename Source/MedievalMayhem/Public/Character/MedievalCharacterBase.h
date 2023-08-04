@@ -28,10 +28,8 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-
 	UPROPERTY(BlueprintAssignable, Category = "Medieval|Character")
 	FCharaterDiedDelegate OnCharacterDied;
-	
 
 	UFUNCTION(BlueprintCallable, Category = "Medieval|Character")
 	virtual bool IsAlive() const;
