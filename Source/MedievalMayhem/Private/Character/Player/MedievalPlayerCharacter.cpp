@@ -130,6 +130,11 @@ void AMedievalPlayerCharacter::Tick(float DeltaTime)
 	}
 }
 
+bool AMedievalPlayerCharacter::IsWeaponEquipped()
+{
+	return false;
+}
+
 //UCharacterAbilitySystemComponent* AMedievalPlayerCharacter::GetCharacterAbilitySystemComponent() const
 //{
 //	AMedievalPlayerState* PS = GetPlayerState<AMedievalPlayerState>();

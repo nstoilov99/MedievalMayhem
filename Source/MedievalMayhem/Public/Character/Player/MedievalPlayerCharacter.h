@@ -7,7 +7,10 @@
 #include "InputActionValue.h"
 #include "MedievalPlayerCharacter.generated.h"
 
-/**
+class USpringArmComponent;
+class UCameraComponent;
+class UInputComponent;
+/*
  * 
  */
 UCLASS()
@@ -18,13 +21,13 @@ class MEDIEVALMAYHEM_API AMedievalPlayerCharacter : public AMedievalCharacterBas
 public:
 	AMedievalPlayerCharacter(const class FObjectInitializer& ObjectInitializer);
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	virtual void PossessedBy(AController* NewController) override;
 
-	class USpringArmComponent* GetCameraBoom();
+	USpringArmComponent* GetCameraBoom();
 
-	class UCameraComponent* GetFollowCamera();
+	UCameraComponent* GetFollowCamera();
 
 	UFUNCTION(BlueprintCallable, Category = "Medieval|Camera")
 	float GetStartingCameraBoomArmLength();
@@ -33,6 +36,8 @@ public:
 	FVector GetStartingCameraBoomLocation();
 
 	virtual void Tick(float DeltaTime) override;
+
+	bool IsWeaponEquipped();
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Medieval|Camera")
 	float BaseTurnRate = 45.0f;
