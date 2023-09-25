@@ -12,7 +12,9 @@
 				"Engine",
 				"GameplayAbilities",
 				"AIModule",
-				"UMG"
+				"UMG",
+				"EnhancedInput",
+				"CoreUObject"
 			]
 		}
 	],
@@ -26,6 +28,10 @@
 		},
 		{
 			"Name": "GameplayAbilities",
+			"Enabled": true
+		},
+		{
+			"Name": "SkeletalMeshModelingTools",
 			"Enabled": true
 		}
 	]

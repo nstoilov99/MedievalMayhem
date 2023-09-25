@@ -9,7 +9,11 @@
 #include "GameplayTagContainer.h"
 #include "MedievalCharacterBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharaterDiedDelegate, AMedievalCharacterBase*, Character);
+class UAbilitySystemComponent;
+class UAttributeSet;
+class UGameplayEffect;
+class UGameplayAbility;
+class UAnimMontage;
 
 UCLASS()
 class MEDIEVALMAYHEM_API AMedievalCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -18,79 +22,42 @@ class MEDIEVALMAYHEM_API AMedievalCharacterBase : public ACharacter, public IAbi
 
 public:
 	// Sets default values for this character's properties
-	AMedievalCharacterBase(const class FObjectInitializer& ObjectInitializer);
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	AMedievalCharacterBase();
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UPROPERTY(BlueprintAssignable, Category = "Medieval|Character")
-	FCharaterDiedDelegate OnCharacterDied;
-
-	UFUNCTION(BlueprintCallable, Category = "Medieval|Character")
-	virtual bool IsAlive() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Medieval|Character")
-	virtual int32 GetAbilityLevel(MedievalAbilityID AbilityID) const;
-
-	virtual void RemoveCharacterAbilities();
-
-	virtual void Die();
-
-	UFUNCTION(BlueprintCallable, Category = "Medieval|Character")
-	virtual void FinishDying();
-
-	UFUNCTION(BlueprintCallable, Category = "Medieval|Character|Attributes")
-	float GetCharacterLevel() const;
-	UFUNCTION(BlueprintCallable, Category = "Medieval|Character|Attributes")
-	float GetHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Medieval|Character|Attributes")
-	float GetMaxHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Medieval|Character|Attributes")
-	float GetMana() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Medieval|Character|Attributes")
-	float GetMaxMana() const;
-
+	bool IsWeaponEquipped();
+	USkeletalMeshComponent* GetWeapon();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//UPROPERTY(BlueprintReadOnly, Category = "Medieval|Abilities")
-	TWeakObjectPtr<class UCharacterAbilitySystemComponent> AbilitySystemComponent;
-	TWeakObjectPtr<class UCharacterAttributeSetBase> AttributeSetBase;
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;
 
 	FGameplayTag DeadTag;
 	FGameplayTag EffectRemoveOnDeathTag;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Medieval|Character")
-	FText CharacterName;
+	virtual void InitAbilityActorInfo();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Medieval|Animation")
-	UAnimMontage* DeathMontage;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Medieval|Abilities")
-	TArray<TSubclassOf<class UCharacterGameplayAbility>> CharacterAbilities;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Medieval|Abilities")
-	TSubclassOf<class UGameplayEffect> DefaultAttributes;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Medieval|Abilities")
-	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
+	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
+	virtual void InitializeDefaultAttributes() const;
 
-	virtual void AddCharacterAbilities();
+	void AddCharacterAbilities();
+private:
 
-	virtual void InitializeAtrributes();
-
-	virtual void AddStartupEffects();
-
-	virtual void SetHealth(float Health);
-	virtual void SetMana(float Mana);
-
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

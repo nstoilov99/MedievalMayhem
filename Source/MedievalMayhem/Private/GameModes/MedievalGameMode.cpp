@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Character/Player/MedievalPlayerController.h"
+#include "Player/MedievalPlayerController.h"
 #include "GameModes/MedievalGameMode.h"
 
 void AMedievalGameMode::OnMatchStateSet()
