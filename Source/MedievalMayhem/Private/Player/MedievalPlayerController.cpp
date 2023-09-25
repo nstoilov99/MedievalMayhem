@@ -119,12 +119,12 @@ void AMedievalPlayerController::TracePlayerInteractable()
 		IInteractionInterface* Interaction = Cast<IInteractionInterface>(HitResult.GetActor());
 		if (Hit && Interaction)
 		{
-			Interaction->ShowInteractionWidget(true);
-			LastInteraction = Interaction;
+			//Interaction->ShowInteractionWidget(true);
+			//LastInteraction = Interaction;
 		}
 		if (!Hit || Interaction == nullptr)
 		{
-			LastInteraction->ShowInteractionWidget(false);
+			//LastInteraction->ShowInteractionWidget(false);
 		}
 	}
 }
