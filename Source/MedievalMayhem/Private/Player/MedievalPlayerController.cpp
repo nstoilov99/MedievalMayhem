@@ -3,7 +3,8 @@
 #include "Character/MedievalPlayerCharacter.h"
 #include "Player/MedievalPlayerController.h"
 #include "Player/MedievalPlayerState.h"
-#include "Interaction/InteractionInterface.h"
+#include "UI/HUD/MedievalHUD.h"
+#include "Interfaces/InteractionInterface.h"
 #include "MedievalMayhem/MedievalMayhem.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -30,12 +31,16 @@ void AMedievalPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(MedievalContext, 0);
 	}
+	HUD = Cast<AMedievalHUD>(GetHUD());
 }
 
 void AMedievalPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (GetWorld()->TimeSince(LastInteractionCheckTime) > InteractionCheckFrequency)
+	{
+		TraceInteractable();
+	}
 }
 
 void AMedievalPlayerController::SetupInputComponent()
@@ -47,7 +52,9 @@ void AMedievalPlayerController::SetupInputComponent()
 	MedievalInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMedievalPlayerController::Move);
 	MedievalInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMedievalPlayerController::Look);
 	MedievalInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMedievalPlayerController::Jump);
-	MedievalInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMedievalPlayerController::Interact);
+	MedievalInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMedievalPlayerController::BeginInteract);
+	MedievalInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AMedievalPlayerController::EndInteract);
+	MedievalInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &AMedievalPlayerController::ToggleMenu);
 	MedievalInputComponent->BindAbilityActions(AbilityInputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
@@ -71,7 +78,7 @@ void AMedievalPlayerController::Look(const FInputActionValue& Value)
 	GetPawn()->AddControllerPitchInput(LookAxisVector.Y);
 	GetPawn()->AddControllerYawInput(LookAxisVector.X);
 	
-	TracePlayerInteractable();
+	TraceInteractable();
 }
 
 void AMedievalPlayerController::Jump()
@@ -81,11 +88,6 @@ void AMedievalPlayerController::Jump()
 	{
 		MedievalCharacter->Jump();
 	}
-}
-
-void AMedievalPlayerController::Interact()
-{
-
 }
 
 void AMedievalPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
@@ -100,35 +102,152 @@ void AMedievalPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
 }
 
-void AMedievalPlayerController::TracePlayerInteractable()
+void AMedievalPlayerController::TraceInteractable()
 {
 	if (AMedievalPlayerCharacter* PlayerCharacter = Cast<AMedievalPlayerCharacter>(GetPawn()))
 	{
+		LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
+
 		FVector TraceLocationStart;
 		FRotator TraceRotation;
 		GetPlayerViewPoint(TraceLocationStart, TraceRotation);
 		FVector TraceLocationEnd = TraceLocationStart + UKismetMathLibrary::GetForwardVector(TraceRotation) * TraceScale;
 
 		FHitResult HitResult;
-		TArray<AActor*> ActorToIgnore;
 		bool Hit = UKismetSystemLibrary::SphereTraceSingle(
 			GetWorld(), TraceLocationStart, TraceLocationEnd, TraceSphereRadius,
-			UEngineTypes::ConvertToTraceType(ECC_Interactable), false, ActorToIgnore,
+			UEngineTypes::ConvertToTraceType(ECC_Interactable), false, TraceActorsToIgnore,
 			EDrawDebugTrace::None, HitResult, true);
+		
+		if (Hit)
+		{
+			if (HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
+			{
+				bIsInteracting = true;
 
-		IInteractionInterface* Interaction = Cast<IInteractionInterface>(HitResult.GetActor());
-		if (Hit && Interaction)
-		{
-			//Interaction->ShowInteractionWidget(true);
-			//LastInteraction = Interaction;
+				if (HitResult.GetActor() != CurrentInteractable)
+				{
+					FoundInteractable(HitResult.GetActor());
+					return;
+				}
+				if (HitResult.GetActor() == CurrentInteractable)
+				{
+					return;
+				}
+			}
 		}
-		if (!Hit || Interaction == nullptr)
+		NoInteractableFound();
+	}
+}
+
+void AMedievalPlayerController::FoundInteractable(AActor* NewInteractable)
+{
+	if (IsInteracting())
+	{
+		EndInteract();
+	}
+
+	if (CurrentInteractable)
+	{
+		TargetInteractable = CurrentInteractable;
+		TargetInteractable->EndFocus();
+	}
+
+	CurrentInteractable = NewInteractable;
+	TargetInteractable = NewInteractable;
+
+	HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+
+	TargetInteractable->BeginFocus();
+}
+
+void AMedievalPlayerController::NoInteractableFound()
+{
+	if (IsInteracting())
+	{
+		bIsInteracting = false;
+		GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+	}
+
+	if (CurrentInteractable)
+	{
+		if (IsValid(TargetInteractable.GetObject()))
 		{
-			//LastInteraction->ShowInteractionWidget(false);
+			TargetInteractable->EndFocus();
 		}
+
+		HUD->HideInteractionWidget();
+
+		CurrentInteractable = nullptr;
+		TargetInteractable = nullptr;
+	}
+}
+
+void AMedievalPlayerController::BeginInteract()
+{
+	TraceInteractable();
+
+	if (CurrentInteractable)
+	{
+		if (IsValid(TargetInteractable.GetObject()))
+		{
+			TargetInteractable->BeginInteract();
+			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
+			{
+				Interact();
+			}
+			else
+			{
+				GetWorldTimerManager().SetTimer(TimerHandle_Interaction,
+					this,
+					&AMedievalPlayerController::Interact,
+					TargetInteractable->InteractableData.InteractionDuration,
+					false);
+			}
+		}
+	}
+}
+
+void AMedievalPlayerController::Interact()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		if (AMedievalPlayerCharacter* PlayerCharacter = Cast<AMedievalPlayerCharacter>(GetPawn()))
+		{
+			TargetInteractable->Interact(PlayerCharacter);
+		}
+	}
+}
+
+void AMedievalPlayerController::EndInteract()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		TargetInteractable->EndInteract();
+	}
+}
+
+void AMedievalPlayerController::UpdateInteractionWidget() const
+{
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	}
+}
+
+void AMedievalPlayerController::ToggleMenu()
+{
+	if (HUD)
+	{
+		HUD->ToggleInventory();
 	}
 }
 
 void AMedievalPlayerController::OnMatchStateSet(FName State)
 {
 }
+

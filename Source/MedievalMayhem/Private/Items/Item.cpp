@@ -14,16 +14,25 @@ AItem::AItem()
 	bReplicates = true;
 	SetReplicateMovement(true);
 
-	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
-	SetRootComponent(ItemMesh);
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Item Mesh"));
+	Mesh->SetupAttachment(RootComponent);
 
-	ItemMesh->SetCollisionResponseToChannels(ECollisionResponse::ECR_Block);
-	ItemMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	ItemMesh->SetCollisionResponseToChannel(ECC_Interactable, ECollisionResponse::ECR_Block);
-	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh->SetCollisionResponseToChannels(ECollisionResponse::ECR_Block);
+	Mesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Interactable, ECollisionResponse::ECR_Block);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh->SetEnableGravity(true);
 
 	ItemWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Interaction Widget"));
 	ItemWidget->SetupAttachment(RootComponent);
+}
+
+void AItem::EnableCustomDepth(bool bEnable)
+{
+	if (Mesh)
+	{
+		Mesh->SetRenderCustomDepth(bEnable);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -31,4 +40,8 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (ItemWidget)
+	{
+		ItemWidget->SetVisibility(false);
+	}
 }

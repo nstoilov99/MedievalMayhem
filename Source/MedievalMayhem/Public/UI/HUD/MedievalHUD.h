@@ -7,10 +7,13 @@
 #include "MedievalHUD.generated.h"
 
 class UMedievalUserWidget;
+class UInteractionWidget;
+class UInventoryMenuWidget;
 class UOverlayWidgetController;
 class UAbilitySystemComponent;
 class UAttributeSet;
 struct FWidgetControllerParams;
+struct FInteractableData;
 /**
  * 
  */
@@ -22,8 +25,18 @@ public:
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
-protected:
 
+	bool bIsMenuVisible;
+
+	void DisplayInventory();
+	void HideInventory();
+	void ToggleInventory();
+
+	void ShowInteractionWidget() const;
+	void HideInteractionWidget() const;
+	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
+protected:
+	virtual void BeginPlay() override;
 private:
 
 	UPROPERTY()
@@ -37,4 +50,17 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
+
+	UPROPERTY()
+	TObjectPtr<UInventoryMenuWidget> InventoryMenuWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UInventoryMenuWidget> InventoryMenuWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UInteractionWidget> InteractionWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UInteractionWidget> InteractionWidgetClass;
+
 };

@@ -29,7 +29,7 @@ void AMedievalEffectActor::ApplyEffectToTarget(AActor* TargetActor, TArray<TSubc
 
 	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(this);
-	for (auto &GEClass : GameplayEffectClasses)
+	for (auto GEClass : GameplayEffectClasses)
 	{
 		check(GEClass);
 		const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GEClass, ActorLevel, EffectContextHandle);
@@ -48,7 +48,7 @@ void AMedievalEffectActor::ApplyEffectToTarget(AActor* TargetActor, TArray<TSubc
 
 void AMedievalEffectActor::OnOverlap(AActor* TargetActor)
 {
-	if (TargetActor->ActorHasTag("Enemy") && !bApplyEffectToEnemies) return;
+	//if (TargetActor->ActorHasTag("Enemy") && !bApplyEffectToEnemies) return;
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClasses);
@@ -65,7 +65,7 @@ void AMedievalEffectActor::OnOverlap(AActor* TargetActor)
 
 void AMedievalEffectActor::OnEndOverlap(AActor* TargetActor)
 {
-	if (TargetActor->ActorHasTag("Enemy") && !bApplyEffectToEnemies) return;
+	//if (TargetActor->ActorHasTag("Enemy") && !bApplyEffectToEnemies) return;
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClasses);
@@ -82,6 +82,7 @@ void AMedievalEffectActor::OnEndOverlap(AActor* TargetActor)
 	{
 		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 		if (!IsValid(TargetASC)) return;
+
 		TArray<FActiveGameplayEffectHandle> HandlesToRemove;
 		for (auto HandlePair : ActiveEffectHandles)
 		{
@@ -90,10 +91,10 @@ void AMedievalEffectActor::OnEndOverlap(AActor* TargetActor)
 				TargetASC->RemoveActiveGameplayEffect(HandlePair.Key, -1);
 				HandlesToRemove.Add(HandlePair.Key);
 			}
-			for (auto &Handle : HandlesToRemove)
-			{
-				ActiveEffectHandles.FindAndRemoveChecked(Handle);
-			}
+		}
+		for (auto& Handle : HandlesToRemove)
+		{
+			ActiveEffectHandles.FindAndRemoveChecked(Handle);
 		}
 	}
 

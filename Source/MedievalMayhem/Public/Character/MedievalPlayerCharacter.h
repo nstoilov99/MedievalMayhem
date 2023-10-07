@@ -8,6 +8,9 @@
 #include "MedievalPlayerCharacter.generated.h"
 
 class USpringArmComponent;
+class UInventoryComponent;
+class AEquipment;
+class UItemBase;
 class UCameraComponent;
 class UInputComponent;
 /*
@@ -25,7 +28,12 @@ public:
 
 	virtual void OnRep_PlayerState() override;
 
-	bool IsWeaponEquipped();
+	void EquipWeapon(AEquipment* WeaponToEquip);
+
+	void DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop);
+
+	bool IsWeaponEquipped() const;
+	FORCEINLINE UInventoryComponent* GetInventory()const { return PlayerInventory; };
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Medieval|Camera")
 	float BaseTurnRate = 45.0f;
@@ -40,10 +48,15 @@ protected:
 	FVector StartingCameraBoomLocation;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Medieval|Camera")
-	class USpringArmComponent* CameraBoom;
+	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Medieval|Camera")
-	class UCameraComponent* FollowCamera;
+	TObjectPtr<UCameraComponent> FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	TObjectPtr<UInventoryComponent> PlayerInventory;
+
+	TObjectPtr<AEquipment> EquippedWeapon;
 
 private:
 	virtual void InitAbilityActorInfo() override;

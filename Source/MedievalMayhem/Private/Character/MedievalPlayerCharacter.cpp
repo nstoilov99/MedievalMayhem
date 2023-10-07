@@ -5,12 +5,16 @@
 #include "UI/HUD/MedievalHUD.h"
 #include "Player/MedievalPlayerState.h"
 #include "Player/MedievalPlayerController.h"
+#include "Items/Pickup.h"
+#include "Items/Equipment.h"
+#include "UI/Widgets/Inventory/InventoryComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "AbilitySystem/MedievalAbilitySystemComponent.h"
 #include "MedievalMayhem/MedievalMayhem.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Engine/EngineTypes.h"
 
 AMedievalPlayerCharacter::AMedievalPlayerCharacter()
@@ -27,6 +31,9 @@ AMedievalPlayerCharacter::AMedievalPlayerCharacter()
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+
+	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
+	PlayerInventory->SetSlotsCapacity(20);
 }
 
 void AMedievalPlayerCharacter::PossessedBy(AController* NewController)
@@ -45,8 +52,54 @@ void AMedievalPlayerCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
-bool AMedievalPlayerCharacter::IsWeaponEquipped()
+void AMedievalPlayerCharacter::EquipWeapon(AEquipment* WeaponToEquip)
 {
+	if (EquippedWeapon)
+	{
+		return;
+	}
+
+	EquippedWeapon = WeaponToEquip;
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+
+	const USkeletalMeshSocket* HandSocket = GetMesh()->GetSocketByName(FName("WeaponSocket"));
+	if (HandSocket)
+	{
+		HandSocket->AttachActor(EquippedWeapon, GetMesh());
+	}
+	EquippedWeapon->SetOwner(this);
+}
+
+void AMedievalPlayerCharacter::DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop)
+{
+	if (PlayerInventory->FindMatchingItem(ItemToDrop))
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.bNoFail = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		const FVector SpawnLocation{ GetActorLocation() + (GetActorForwardVector() * 50.f) };
+		const FTransform SpawnTransform(GetActorRotation(), SpawnLocation);
+
+		const int32 RemovedQuantity = PlayerInventory->RemoveAmountOfItem(ItemToDrop, QuantityToDrop);
+
+		APickup* Pickup = GetWorld()->SpawnActor<APickup>(APickup::StaticClass(), SpawnTransform, SpawnParams);
+
+		Pickup->InitializeDrop(ItemToDrop, RemovedQuantity);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Item to drop was somehow null!"));
+	}
+}
+
+bool AMedievalPlayerCharacter::IsWeaponEquipped() const
+{
+	if (EquippedWeapon)
+	{
+		return true;
+	}
 	return false;
 }
 
