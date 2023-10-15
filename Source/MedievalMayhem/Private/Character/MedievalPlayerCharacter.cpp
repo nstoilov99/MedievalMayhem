@@ -7,7 +7,8 @@
 #include "Player/MedievalPlayerController.h"
 #include "Items/Pickup.h"
 #include "Items/Equipment.h"
-#include "UI/Widgets/Inventory/InventoryComponent.h"
+#include "Components/InventoryComponent.h"
+#include "Components/EquipmentComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -34,6 +35,8 @@ AMedievalPlayerCharacter::AMedievalPlayerCharacter()
 
 	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
 	PlayerInventory->SetSlotsCapacity(20);
+
+	PlayerEquipment = CreateDefaultSubobject<UEquipmentComponent>(TEXT("PlayerEquipment"));
 }
 
 void AMedievalPlayerCharacter::PossessedBy(AController* NewController)
@@ -52,9 +55,9 @@ void AMedievalPlayerCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
-void AMedievalPlayerCharacter::EquipWeapon(AEquipment* WeaponToEquip)
+void AMedievalPlayerCharacter::EquipWeapon(AEquipment* ItemToEquip)
 {
-	if (EquippedWeapon)
+	/*if (PlayerEquipment)
 	{
 		return;
 	}
@@ -67,7 +70,7 @@ void AMedievalPlayerCharacter::EquipWeapon(AEquipment* WeaponToEquip)
 	{
 		HandSocket->AttachActor(EquippedWeapon, GetMesh());
 	}
-	EquippedWeapon->SetOwner(this);
+	EquippedWeapon->SetOwner(this);*/
 }
 
 void AMedievalPlayerCharacter::DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop)
@@ -96,10 +99,11 @@ void AMedievalPlayerCharacter::DropItem(UItemBase* ItemToDrop, const int32 Quant
 
 bool AMedievalPlayerCharacter::IsWeaponEquipped() const
 {
-	if (EquippedWeapon)
+	/*if (EquippedWeapon)
 	{
 		return true;
 	}
+	*/
 	return false;
 }
 

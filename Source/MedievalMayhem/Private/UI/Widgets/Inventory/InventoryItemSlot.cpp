@@ -70,7 +70,7 @@ FReply UInventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, 
     {
         return Reply.Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
     }
-
+    
     //submenu on right click will happen here
 
     return Reply.Unhandled();

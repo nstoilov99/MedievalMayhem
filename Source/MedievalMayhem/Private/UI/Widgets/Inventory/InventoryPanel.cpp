@@ -4,7 +4,7 @@
 #include "UI/Widgets/Inventory/InventoryPanel.h"
 #include "UI/Widgets/Inventory/InventoryItemSlot.h"
 #include "UI/Widgets/Inventory/ItemDragDropOperation.h"
-#include "UI/Widgets/Inventory/InventoryComponent.h"
+#include "Components/InventoryComponent.h"
 #include "Components/TextBlock.h"
 #include "Components/WrapBox.h"
 #include "Character/MedievalPlayerCharacter.h"

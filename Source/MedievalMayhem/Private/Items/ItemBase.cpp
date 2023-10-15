@@ -2,7 +2,7 @@
 
 
 #include "Items/ItemBase.h"
-#include "UI/Widgets/Inventory/InventoryComponent.h"
+#include "Components/InventoryComponent.h"
 
 UItemBase::UItemBase() : bIsCopy(false), bIsPickup(false)
 {

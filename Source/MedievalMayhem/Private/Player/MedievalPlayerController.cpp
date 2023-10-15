@@ -102,41 +102,45 @@ void AMedievalPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
 }
 
-void AMedievalPlayerController::TraceInteractable()
+void AMedievalPlayerController::TraceInteractable_Implementation()
 {
 	if (AMedievalPlayerCharacter* PlayerCharacter = Cast<AMedievalPlayerCharacter>(GetPawn()))
 	{
-		LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
-
-		FVector TraceLocationStart;
-		FRotator TraceRotation;
-		GetPlayerViewPoint(TraceLocationStart, TraceRotation);
-		FVector TraceLocationEnd = TraceLocationStart + UKismetMathLibrary::GetForwardVector(TraceRotation) * TraceScale;
-
-		FHitResult HitResult;
-		bool Hit = UKismetSystemLibrary::SphereTraceSingle(
-			GetWorld(), TraceLocationStart, TraceLocationEnd, TraceSphereRadius,
-			UEngineTypes::ConvertToTraceType(ECC_Interactable), false, TraceActorsToIgnore,
-			EDrawDebugTrace::None, HitResult, true);
-		
-		if (Hit)
+		if (IsLocalController())
 		{
-			if (HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
-			{
-				bIsInteracting = true;
+			LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
 
-				if (HitResult.GetActor() != CurrentInteractable)
+			FVector TraceLocationStart;
+			FRotator TraceRotation;
+			GetPlayerViewPoint(TraceLocationStart, TraceRotation);
+			FVector TraceLocationEnd = TraceLocationStart + UKismetMathLibrary::GetForwardVector(TraceRotation) * TraceScale;
+
+			FHitResult HitResult;
+			bool Hit = UKismetSystemLibrary::SphereTraceSingle(
+				GetWorld(), TraceLocationStart, TraceLocationEnd, TraceSphereRadius,
+				UEngineTypes::ConvertToTraceType(ECC_Interactable), false, TraceActorsToIgnore,
+				EDrawDebugTrace::None, HitResult, true);
+
+			if (Hit)
+			{
+				if (HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
 				{
-					FoundInteractable(HitResult.GetActor());
-					return;
-				}
-				if (HitResult.GetActor() == CurrentInteractable)
-				{
-					return;
+					bIsInteracting = true;
+
+					if (HitResult.GetActor() != CurrentInteractable)
+					{
+						FoundInteractable(HitResult.GetActor());
+						return;
+					}
+					if (HitResult.GetActor() == CurrentInteractable)
+					{
+						return;
+					}
 				}
 			}
+			NoInteractableFound();
 		}
-		NoInteractableFound();
+		
 	}
 }
 

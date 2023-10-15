@@ -34,7 +34,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UInventoryItemSlot> InventorySlotClass;
-
+	
 	UFUNCTION()
 	void RefreshInventory();
 protected:

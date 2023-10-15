@@ -59,7 +59,7 @@ void AMedievalEffectActor::OnOverlap(AActor* TargetActor)
 	}
 	if (InfiniteEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClassses);
+		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClasses);
 	}
 }
 
@@ -76,7 +76,7 @@ void AMedievalEffectActor::OnEndOverlap(AActor* TargetActor)
 	}
 	if (InfiniteEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClassses);
+		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClasses);
 	}
 	if (InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
 	{

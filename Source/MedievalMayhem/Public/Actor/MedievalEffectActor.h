@@ -66,7 +66,7 @@ protected:
 	EEffectApplicationPolicy DurationEffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
-	TArray<TSubclassOf<UGameplayEffect>> InfiniteGameplayEffectClassses;
+	TArray<TSubclassOf<UGameplayEffect>> InfiniteGameplayEffectClasses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
 	EEffectApplicationPolicy InfiniteEffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;

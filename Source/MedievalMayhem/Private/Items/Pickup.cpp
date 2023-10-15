@@ -3,7 +3,7 @@
 
 #include "Items/Pickup.h"
 #include "Items/ItemBase.h"
-#include "UI/Widgets/Inventory/InventoryComponent.h"
+#include "Components/InventoryComponent.h"
 #include "Player/MedievalPlayerController.h"
 #include "Character/MedievalPlayerCharacter.h"
 
@@ -140,6 +140,7 @@ void APickup::ShowInteractionWidget(bool bShowWidget)
 {
 }
 
+#if WITH_EDITOR
 void APickup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -156,3 +157,4 @@ void APickup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent
 		}
 	}
 }
+#endif

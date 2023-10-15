@@ -8,6 +8,7 @@
 
 class UItemBase;
 class UInventoryComponent;
+class UEquipmentComponent;
 /**
  * 
  */
@@ -22,4 +23,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UInventoryComponent> SourceInventory;
+
+	UPROPERTY()
+	TObjectPtr<UEquipmentComponent> EquipmentInventory;
 };

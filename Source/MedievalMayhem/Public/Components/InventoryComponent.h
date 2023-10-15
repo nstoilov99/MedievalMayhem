@@ -23,10 +23,10 @@ struct FItemAddResult
 {
 	GENERATED_BODY()
 
-		FItemAddResult() :
-		ActualAmountAdded(0),
-		OperationResult(EItemAddResult::EIAR_NoItemAdded),
-		ResultMessage(FText::GetEmpty())
+	FItemAddResult() :
+	ActualAmountAdded(0),
+	OperationResult(EItemAddResult::EIAR_NoItemAdded),
+	ResultMessage(FText::GetEmpty())
 	{};
 
 	// Actaul amount of item that was added to the inventory

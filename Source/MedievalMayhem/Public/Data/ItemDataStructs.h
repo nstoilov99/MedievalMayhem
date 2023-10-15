@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "AbilitySystem/MedievalAttributeSet.h"
 #include "ItemDataStructs.generated.h"
 
+class UMedievalAttributeSet;
+class UGameplayEffect;
 /**
  * 
  */
@@ -21,18 +24,18 @@ enum class EItemType : uint8
 UENUM()
 enum class EGearType : uint8
 {
-	EGST_None UMETA(DisplayName = "None"),
 	EGST_Head UMETA(DisplayName = "Head"),
 	EGST_Necklace UMETA(DisplayName = "Necklace"),
-	EGST_Shoulders UMETA(DisplayName = "Shoulders"),
 	EGST_Chest UMETA(DisplayName = "Chest"),
 	EGST_Gloves UMETA(DisplayName = "Gloves"),
 	EGST_Ring UMETA(DisplayName = "Ring"),
 	EGST_Pants UMETA(DisplayName = "Pants"),
 	EGST_Boots UMETA(DisplayName = "Boots"),
+	EGST_Weapon1H UMETA(DisplayName = "Two Handed Weapon"),
+	EGST_Weapon2H UMETA(DisplayName = "Two Handed Weapon"),
+	EGST_MainHand UMETA(DisplayName = "Main Hand Weapon"),
 	EGST_Offhand UMETA(DisplayName = "Offhand"),
-	EGST_Weapon UMETA(DisplayName = "Weapon"),
-	EGST_Weapon2H UMETA(DisplayName = "Two Handed Weapon")
+	EGST_MAX UMETA(DisplayName = "Max")
 };
 
 UENUM()
@@ -63,16 +66,31 @@ struct FItemTextData
 	FText UsageText;
 };
 
+//USTRUCT()
+//struct FEquipmentAttributeData 
+//{
+//	GENERATED_BODY()
+//
+//	UPROPERTY(EditAnywhere)
+//	FGameplayAttribute Attribute;
+//
+//	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0"))
+//	float MinValue;
+//
+//	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0"))
+//	float MaxValue;
+//};
+
 USTRUCT()
 struct FItemNumericData
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	int32 MaxStackSize;
+	int32 MaxStackSize = 1;
 
 	UPROPERTY(EditAnywhere)
-	bool bIsStackable;
+	bool bIsStackable = false;
 };
 
 USTRUCT()
@@ -96,18 +114,24 @@ struct FItemData : public FTableRowBase
 	FName ID;
 
 	UPROPERTY(EditAnywhere, Category = "Item Data")
-	EGearType GearType;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
 	EItemType ItemType;
+
+	UPROPERTY(EditAnywhere, Category = "Item Data", meta = (EditCondition = "ItemType == EItemType::EIT_Gear", EditConditionHides))
+	EGearType GearType;
 
 	UPROPERTY(EditAnywhere, Category = "Item Data")
 	EItemQuality ItemQuality;
 
+	//UPROPERTY(EditAnywhere, Category = "Item Data", meta = (EditCondition = "ItemType == EItemType::EIT_Gear", EditConditionHides))
+	//TArray<FEquipmentAttributeData> AttributeData;
+
+	UPROPERTY(EditAnywhere, Category = "Item Data", meta = (EditCondition = "ItemType == EItemType::EIT_Gear", EditConditionHides))
+	TArray<TObjectPtr<UGameplayEffect>> AttributeData;
+
 	UPROPERTY(EditAnywhere, Category = "Item Data")
 	FItemTextData TextData;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, Category = "Item Data", meta = (EditCondition = "ItemType != EItemType::EIT_Gear", EditConditionHides))
 	FItemNumericData NumericData;
 
 	UPROPERTY(EditAnywhere, Category = "Item Data")

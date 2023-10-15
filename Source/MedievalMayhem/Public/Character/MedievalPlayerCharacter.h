@@ -9,6 +9,7 @@
 
 class USpringArmComponent;
 class UInventoryComponent;
+class UEquipmentComponent;
 class AEquipment;
 class UItemBase;
 class UCameraComponent;
@@ -56,7 +57,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	TObjectPtr<UInventoryComponent> PlayerInventory;
 
-	TObjectPtr<AEquipment> EquippedWeapon;
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TObjectPtr<UEquipmentComponent> PlayerEquipment;
 
 private:
 	virtual void InitAbilityActorInfo() override;

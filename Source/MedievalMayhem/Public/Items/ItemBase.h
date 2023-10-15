@@ -8,6 +8,7 @@
 
 class AMedievalPlayerCharacter;
 class UInventoryComponent;
+class UEquipmentComponent;
 class USphereComponent;
 class UWidgetComponent;
 /**
@@ -19,16 +20,12 @@ class MEDIEVALMAYHEM_API UItemBase : public UObject
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
-	TObjectPtr<UStaticMeshComponent> ItemMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
-	TObjectPtr<USphereComponent> AreaSphere;
+	UPROPERTY()
+	TObjectPtr<UInventoryComponent> OwningInventory;
 
-	TObjectPtr<UWidgetComponent> ItemWidget;
-
-	 UPROPERTY()
-	 UInventoryComponent* OwningInventory;
+	UPROPERTY()
+	TObjectPtr<UEquipmentComponent> OwningEquipment;
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	FName ID;

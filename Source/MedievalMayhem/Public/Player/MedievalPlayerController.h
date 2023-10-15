@@ -45,6 +45,7 @@ protected:
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
 
+	UFUNCTION(Client, Reliable)
 	void TraceInteractable();
 	void FoundInteractable(AActor* NewInteractable);
 	void NoInteractableFound();
