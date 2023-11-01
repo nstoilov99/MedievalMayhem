@@ -2,6 +2,8 @@
 
 
 #include "Components/EquipmentComponent.h"
+#include "Data/ItemSlotsByTypes.h"
+#include "Items/ItemBase.h"
 
 // Sets default values for this component's properties
 UEquipmentComponent::UEquipmentComponent()
@@ -25,7 +27,14 @@ void UEquipmentComponent::HandleEquipItem(UItemBase* InItem)
 {
 	if (GetOwner())
 	{
-
+		if (InItem->ItemType == EItemType::EIT_Gear)
+		{
+			EEquipmentSlot FirstSlot = SlotsByTypes->GetFirstSlot(InItem->GearType);
+			if (FirstSlot != EEquipmentSlot::ES_None)
+			{
+				PlayerEquipment[FirstSlot] = InItem;
+			}
+		}
 	}
 }
 

@@ -12,6 +12,7 @@ class UTextBlock;
 class UItemBase;
 class UDragItemVisual;
 class UInventoryTooltip;
+class AMedievalPlayerCharacter;
 /**
  * 
  */
@@ -21,7 +22,7 @@ class MEDIEVALMAYHEM_API UInventoryItemSlot : public UUserWidget
 	GENERATED_BODY()
 public:
 
-
+	AMedievalPlayerCharacter* GetPlayerCharacter();
 	FORCEINLINE void SetItemReference(UItemBase* InItem) { ItemReference = InItem; };
 	FORCEINLINE UItemBase* GetItemReference()const { return ItemReference; };
 protected:

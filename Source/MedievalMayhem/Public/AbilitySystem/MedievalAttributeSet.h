@@ -50,14 +50,30 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Intelligence, Category = "Primary Attributes")
 	FGameplayAttributeData Intelligence;
 	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, Intelligence);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Vitality, Category = "Primary Attributes")
+	FGameplayAttributeData Vitality;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, Vitality);	
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_AllStats, Category = "Primary Attributes")
+	FGameplayAttributeData AllStats;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, AllStats);
 
 	/*
 	* Secondary Attributes
 	*/
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealthPercent, Category = "Secondary Attributes")
+	FGameplayAttributeData HealthPercent;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, HealthPercent);
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Armor, Category = "Secondary Attributes")
 	FGameplayAttributeData Armor;
 	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, Armor);	
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ArmorPercent, Category = "Secondary Attributes")
+	FGameplayAttributeData ArmorPercent;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, ArmorPercent);
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Dodge, Category = "Secondary Attributes")
 	FGameplayAttributeData Dodge;
@@ -79,6 +95,22 @@ public:
 	FGameplayAttributeData CriticalHitDamage;
 	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, CriticalHitDamage);
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_LifeSteal, Category = "Secondary Attributes")
+	FGameplayAttributeData LifeSteal;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, LifeSteal);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealingReceived, Category = "Secondary Attributes")
+	FGameplayAttributeData HealingReceived;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, HealingReceived);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealthOnKill, Category = "Secondary Attributes")
+	FGameplayAttributeData HealthOnKill;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, HealthOnKill);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealthOnHit, Category = "Secondary Attributes")
+	FGameplayAttributeData HealthOnHit;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, HealthOnHit);
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealthRegeneration, Category = "Secondary Attributes")
 	FGameplayAttributeData HealthRegeneration;
 	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, HealthRegeneration);
@@ -87,19 +119,56 @@ public:
 	FGameplayAttributeData Cooldown;
 	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, Cooldown);
 
+	/*
+	* Resistance Attributes
+	*/
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_AllResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData AllResistance;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, AllResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_FireResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData FireResistance;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, FireResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_NatureResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData NatureResistance;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, NatureResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_FrostResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData FrostResistance;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, FrostResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_LightningResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData LightningResistance;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, LightningResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicalResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData PhysicalResistance;
+	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, PhysicalResistance);
 
 	/*
 	* Meta Attributes
 	*/
+
 	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
 	FGameplayAttributeData IncomingDamage;
 	ATTRIBUTE_ACCESSORS(UMedievalAttributeSet, IncomingDamage);
+
+	//----------FUNCTIONS----------//
+	/*
+	* Vital Functions
+	*/
 
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const;
+
+	/*
+	* Primary Functions
+	*/
 
 	UFUNCTION()
 	void OnRep_Strength(const FGameplayAttributeData& OldStrength) const;
@@ -111,7 +180,23 @@ public:
 	void OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const;
 
 	UFUNCTION()
+	void OnRep_Vitality(const FGameplayAttributeData& OldVitality) const;
+
+	UFUNCTION()
+	void OnRep_AllStats(const FGameplayAttributeData& OldAllStats) const;
+
+	/*
+	* Secondary Functions
+	*/
+
+	UFUNCTION()
+	void OnRep_HealthPercent(const FGameplayAttributeData& OldHealthPercent) const;
+
+	UFUNCTION()
 	void OnRep_Armor(const FGameplayAttributeData& OldArmor) const;
+
+	UFUNCTION()
+	void OnRep_ArmorPercent(const FGameplayAttributeData& OldArmorPercent) const;
 
 	UFUNCTION()
 	void OnRep_Dodge(const FGameplayAttributeData& OldDodge) const;
@@ -129,8 +214,43 @@ public:
 	void OnRep_CriticalHitDamage(const FGameplayAttributeData& OldCriticalHitDamage) const;
 
 	UFUNCTION()
+	void OnRep_LifeSteal(const FGameplayAttributeData& OldLifeSteal) const;
+
+	UFUNCTION()
+	void OnRep_HealingReceived(const FGameplayAttributeData& OldHealingReceived) const;
+
+	UFUNCTION()
+	void OnRep_HealthOnKill(const FGameplayAttributeData& OldHealthOnKill) const;
+
+	UFUNCTION()
+	void OnRep_HealthOnHit(const FGameplayAttributeData& OldHealthOnHit) const;
+
+	UFUNCTION()
 	void OnRep_HealthRegeneration(const FGameplayAttributeData& OldHealthRegeneration) const;
 
 	UFUNCTION()
 	void OnRep_Cooldown(const FGameplayAttributeData& OldCooldown) const;
+	
+	/*
+	* Resistance Functions
+	*/
+
+	UFUNCTION()
+	void OnRep_AllResistance(const FGameplayAttributeData& OldAllResistance) const;
+
+	UFUNCTION()
+	void OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const;
+	
+	UFUNCTION()
+	void OnRep_NatureResistance(const FGameplayAttributeData& OldNatureResistance) const;	
+
+	UFUNCTION()
+	void OnRep_FrostResistance(const FGameplayAttributeData& OldFrostResistance) const;
+
+	UFUNCTION()
+	void OnRep_LightningResistance(const FGameplayAttributeData& OldLightningResistance) const;
+
+	UFUNCTION()
+	void OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const;
+
 };

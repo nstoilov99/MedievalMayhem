@@ -8,11 +8,13 @@
 #include "EquipmentComponent.generated.h"
 
 class UInventoryComponent;
+class UItemSlotsByTypes;
 class UItemBase;
 
 UENUM()
 enum class EEquipmentSlot : uint8
 {
+	ES_None UMETA(DisplayName = "None"),
 	ES_Head UMETA(DisplayName = "Head Slot"),
 	ES_Necklace UMETA(DisplayName = "Necklace Slot"),
 	ES_Chest UMETA(DisplayName = "Chest Slot"),
@@ -40,6 +42,9 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	TObjectPtr<UItemSlotsByTypes> SlotsByTypes;
 
 	UPROPERTY(EditAnywhere, Category = "Equipment")
 	TMap<EEquipmentSlot, TObjectPtr<UItemBase>> PlayerEquipment;

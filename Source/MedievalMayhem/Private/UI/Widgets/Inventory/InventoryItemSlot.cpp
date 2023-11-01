@@ -5,10 +5,21 @@
 #include "UI/Widgets/Inventory/DragItemVisual.h"
 #include "UI/Widgets/Inventory/ItemDragDropOperation.h"
 #include "UI/Widgets/Inventory/InventoryTooltip.h"
+#include "Character/MedievalPlayerCharacter.h"
+#include "Components/InventoryComponent.h"
 #include "Items/ItemBase.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+
+AMedievalPlayerCharacter* UInventoryItemSlot::GetPlayerCharacter()
+{
+    if (ItemReference->OwningInventory)
+    {
+        return Cast<AMedievalPlayerCharacter>(ItemReference->OwningInventory->GetOwner());
+    }
+    return nullptr;
+}
 
 void UInventoryItemSlot::NativeOnInitialized()
 {
@@ -69,6 +80,13 @@ FReply UInventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, 
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
         return Reply.Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
+    }
+    if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+    {
+        if (ItemReference->ItemType == EItemType::EIT_Gear)
+        {
+
+        }
     }
     
     //submenu on right click will happen here

@@ -31,11 +31,11 @@ enum class EGearType : uint8
 	EGST_Ring UMETA(DisplayName = "Ring"),
 	EGST_Pants UMETA(DisplayName = "Pants"),
 	EGST_Boots UMETA(DisplayName = "Boots"),
-	EGST_Weapon1H UMETA(DisplayName = "Two Handed Weapon"),
+	EGST_Weapon1H UMETA(DisplayName = "One Handed Weapon"),
 	EGST_Weapon2H UMETA(DisplayName = "Two Handed Weapon"),
-	EGST_MainHand UMETA(DisplayName = "Main Hand Weapon"),
+	EGST_MainHand UMETA(DisplayName = "Main Handed Weapon"),
 	EGST_Offhand UMETA(DisplayName = "Offhand"),
-	EGST_MAX UMETA(DisplayName = "Max")
+	EGST_MAX UMETA(Hidden)
 };
 
 UENUM()
